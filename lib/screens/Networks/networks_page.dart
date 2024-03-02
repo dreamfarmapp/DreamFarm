@@ -56,24 +56,25 @@ class _NetworksScreenState extends State<NetworksScreen> {
               },
             ),
             ListTile(
-              title: Text('Soil Testing Facility'),
+              title: Text('Services'),
               onTap: () {
-                Navigator.pushNamed(context, '/services');
+                Navigator.pushNamed(context, '/networks');
                 // Implement option 2 functionality here
               },
             ),
             ListTile(
-              title: Text('Storage Facility'),
+              title: Text('Job Opportunities'),
               onTap: () {
-                Navigator.pushNamed(context, '/services');
+                Navigator.pushNamed(context, '/skill');
                 // Implement option 2 functionality here
               },
             ),
-            ListTile(
-              title: Text('Input Suppliers Facility'),
+
+             ListTile(
+              title: Text('Therapy'),
               onTap: () {
-                Navigator.pushNamed(context, '/services');
-                // Implement option 2 functionality here
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
               },
             ),
           ],

@@ -45,7 +45,7 @@ class JobCard extends StatelessWidget {
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 20)),
-                    Text('${job.skills.join(",")}',
+                    Text('${job.skills}',
                         style: GoogleFonts.lexend(
                             color: Colors.black,
                             fontWeight: FontWeight.normal,

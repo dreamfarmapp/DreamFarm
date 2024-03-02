@@ -1,75 +1,11 @@
+import 'dart:convert';
+
 import 'package:dreamfarm/Model/ProductModel.dart';
 import 'package:dreamfarm/screens/MarketPlace/product_card.dart';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-final List<ProductModel> allProducts = [
-  ProductModel(
-      productName: "Tractor 1",
-      productPrice: "450",
-      imageUrl:
-          "https://www.csceagri.in/web/image/lead.item/62/image_1920/TRAKSTAR%20531?unique=8f211c5",
-      id: 1,
-      ownerLocation: "Telungana",
-      ownerName: "Ramesh",
-      ownerNumber: "1234567890",
-      productDescription:
-          "The XYZ tractor is a reliable and versatile agricultural machine designed to streamline farm operations and maximize productivity. Built with durability and efficiency in mind, this tractor is suitable for various tasks, including plowing, tilling, planting, and hauling.",
-      type: "rent",
-      duration: "6 months"),
-  ProductModel(
-    productName: "Tractor 2",
-    productPrice: "500",
-    imageUrl:
-        "https://www.csceagri.in/web/image/lead.item/62/image_1920/TRAKSTAR%20531?unique=8f211c5",
-    id: 2,
-    ownerLocation: "Telungana",
-    ownerName: "Suresh",
-    ownerNumber: "9876543210",
-    productDescription:
-        "The ABC tractor is a powerful machine equipped with advanced features to handle heavy-duty farming tasks with ease. It offers exceptional performance and reliability, making it an ideal choice for modern farmers.",
-    type: "buy",
-  ),
-  ProductModel(
-      productName: "Tractor 3",
-      productPrice: "600",
-      imageUrl:
-          "https://www.csceagri.in/web/image/lead.item/62/image_1920/TRAKSTAR%20531?unique=8f211c5",
-      id: 3,
-      ownerLocation: "Telungana",
-      ownerName: "Gopal",
-      ownerNumber: "9876123450",
-      productDescription:
-          "The PQR tractor is a compact yet powerful machine designed for small to medium-sized farms. It offers excellent maneuverability and fuel efficiency, making it suitable for a wide range of agricultural applications.",
-      type: "rent",
-      duration: "6 months"),
-  ProductModel(
-    productName: "Tractor 4",
-    productPrice: "700",
-    imageUrl:
-        "https://www.csceagri.in/web/image/lead.item/62/image_1920/TRAKSTAR%20531?unique=8f211c5",
-    id: 4,
-    ownerLocation: "Telungana",
-    ownerName: "Krishna",
-    ownerNumber: "9012345678",
-    productDescription:
-        "The LMN tractor is an advanced agricultural machine equipped with cutting-edge technology to enhance productivity and performance. It offers superior comfort, control, and efficiency for a seamless farming experience.",
-    type: "buy",
-  ),
-  ProductModel(
-      productName: "Tractor 5",
-      productPrice: "800",
-      imageUrl:
-          "https://www.csceagri.in/web/image/lead.item/62/image_1920/TRAKSTAR%20531?unique=8f211c5",
-      id: 5,
-      ownerLocation: "Telungana",
-      ownerName: "Harish",
-      ownerNumber: "9988776655",
-      productDescription:
-          "The UVW tractor is a high-performance machine engineered for heavy-duty agricultural tasks. It offers exceptional power, efficiency, and durability to handle the most demanding farming operations with ease.",
-      type: "rent",
-      duration: "6 months"),
-];
+import 'package:http/http.dart' as http;
 
 class MarketplaceScreen extends StatefulWidget {
   @override
@@ -77,15 +13,15 @@ class MarketplaceScreen extends StatefulWidget {
 }
 
 class _MarketplaceScreenState extends State<MarketplaceScreen> {
+  List<ProductModel> allProducts = [];
   bool isRent = true;
   TextEditingController controller = TextEditingController();
-  List<ProductModel> filteredProducts =
-      allProducts.where((e) => e.type == "rent").toList();
+  List<ProductModel> filteredProducts = [];
 
   //Toggle Options
   void showRent() {
     List<ProductModel> newProd =
-        allProducts.where((e) => e.type == "rent").toList();
+        allProducts.where((e) => e.type == "Rent").toList();
     setState(() {
       isRent = true;
       filteredProducts = newProd;
@@ -94,22 +30,63 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
 
   void showBuy() {
     List<ProductModel> newProd =
-        allProducts.where((e) => e.type == "buy").toList();
+        allProducts.where((e) => e.type == "Buy").toList();
     setState(() {
       isRent = false;
       filteredProducts = newProd;
     });
   }
 
+  Future<void> fetchAllProducts() async {
+    print("Fetching products...");
+    final response =
+        await http.get(Uri.parse("http://10.0.2.2:8000/marketplace/"));
+    if (response.statusCode == 200) {
+      List<ProductModel> data = [];
+      List<dynamic> respBody = jsonDecode(response.body);
+      print("Response body: $respBody");
+      respBody.forEach((element) {
+        data.add(ProductModel(
+          productName: element['title'],
+          productPrice: element['price'].toString(),
+          imageUrl: element['img'],
+          id: 1,
+          duration:
+              element['duration'] == 0 ? element['duration'].toString() : 0.toString(),
+          ownerLocation: "Telungana",
+          ownerName: "Aswin Raaj P S",
+          ownerNumber: "9568812345",
+          productDescription: element['description'],
+          type: element['type'],
+        ));
+      });
+      print(data);
+      setState(() {
+        allProducts = data;
+        filteredProducts =
+            data.where((e) => e.type == (isRent ? "Rent" : "Buy")).toList();
+      });
+      print("Products fetched successfully.");
+    } else {
+      print("Failed to fetch products: ${response.statusCode}");
+    }
+  }
+
   void handleSearch() {
     List<ProductModel> newProd = allProducts
         .where((element) =>
             element.productName.contains(controller.text) &&
-            (element.type == (isRent ? "rent" : "buy")))
+            (element.type == (isRent ? "Rent" : "Buy")))
         .toList();
     setState(() {
       filteredProducts = newProd;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAllProducts();
   }
 
   @override
@@ -147,12 +124,14 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 controller: controller,
                 onChanged: (value) => handleSearch(),
                 decoration: InputDecoration(
-                    hintText: "Search Products",
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8))),
+                  hintText: "Search Products",
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
             ),
             Padding(
@@ -164,18 +143,20 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     height: 40,
                     width: 100,
                     decoration: BoxDecoration(
-                        color: isRent ? Colors.green[200] : Colors.white,
-                        borderRadius: BorderRadius.circular(12)),
+                      color: isRent ? Colors.green[200] : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: MaterialButton(
                       onPressed: () => showRent(),
                       child: Center(
                         child: Text(
                           "Rent",
                           style: GoogleFonts.lexend(
-                              fontSize: 18,
-                              fontWeight:
-                                  isRent ? FontWeight.bold : FontWeight.normal,
-                              color: Colors.black),
+                            fontSize: 18,
+                            fontWeight:
+                                isRent ? FontWeight.bold : FontWeight.normal,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -184,35 +165,39 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     height: 40,
                     width: 100,
                     decoration: BoxDecoration(
-                        color: !isRent ? Colors.green[200] : Colors.white,
-                        borderRadius: BorderRadius.circular(12)),
+                      color: !isRent ? Colors.green[200] : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: MaterialButton(
                       onPressed: () => showBuy(),
                       child: Center(
                         child: Text(
                           "Buy",
                           style: GoogleFonts.lexend(
-                              fontSize: 18,
-                              fontWeight:
-                                  !isRent ? FontWeight.bold : FontWeight.normal,
-                              color: Colors.black),
+                            fontSize: 18,
+                            fontWeight:
+                                !isRent ? FontWeight.bold : FontWeight.normal,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
             ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: filteredProducts.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: EdgeInsets.all(8),
-                    child: ProductCard(product: filteredProducts[index]),
-                  );
-                })
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: filteredProducts.length,
+              itemBuilder: (BuildContext context, int index) {
+                print("Index: $index");
+                return Padding(
+                  padding: EdgeInsets.all(8),
+                  child: ProductCard(product: filteredProducts[index]),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -249,6 +234,51 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             label: 'MarketPlace',
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text(
+                'Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.green,
+              ),
+            ),
+            ListTile(
+              title: Text('Crop Doc'),
+              onTap: () {
+                Navigator.pushNamed(context, "/cropdoc-input");
+                // Implement option 1 functionality here
+              },
+            ),
+            ListTile(
+              title: Text('Services'),
+              onTap: () {
+                makeCall("http://192.168.137.36:8501");
+                // Implement option 2 functionality here
+              },
+            ),
+            ListTile(
+              title: Text('Job Opportunities'),
+              onTap: () {
+                Navigator.pushNamed(context, '/skill');
+                // Implement option 2 functionality here
+              },
+            ),
+
+             ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

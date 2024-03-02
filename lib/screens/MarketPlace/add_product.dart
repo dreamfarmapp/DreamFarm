@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -21,7 +23,31 @@ class _AddProductScreenState extends State<AddProductScreen> {
   String _selectedOption = 'Rent';
   bool isLoading = false;
 
-  void handleSubmit() {}
+  Future<void> handleSubmit() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String name = jsonDecode(prefs.getString("user")!)["name"];
+    Map<dynamic, dynamic> reqBody = {
+      "title": nameController.text,
+      "img": _imageUrlController.text,
+      "price": priceController.text,
+      "description": descController.text,
+      "duration": durationController.text != '' ? durationController.text : 0,
+      "type": _selectedOption
+    };
+
+    final response =
+        await http.post(Uri.parse("http://10.0.2.2:8000/marketplace/"),
+            headers: <String, String>{
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode(reqBody));
+    if (response.statusCode == 201) {
+      Navigator.pushNamed(context, "/marketplace");
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error adding product")));
+    }
+  }
 
   final TextEditingController _imageUrlController = TextEditingController();
   File? _imageFile;
@@ -104,7 +130,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             ListTile(
               title: Text('Services'),
               onTap: () {
-                Navigator.pushNamed(context, '/services');
+                 makeCall("http://192.168.137.36:8501");
                 // Implement option 2 functionality here
               },
             ),
@@ -113,6 +139,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
               onTap: () {
                 Navigator.pushNamed(context, '/skill');
                 // Implement option 2 functionality here
+              },
+            ),
+
+             ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
               },
             ),
           ],

@@ -108,6 +108,16 @@ class _PostState extends State<Post> {
           ),
           SizedBox(
             width: 315.w,
+            child: Text(widget.post.title,
+              style: GoogleFonts.roboto(
+                color: Colors.black,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 315.w,
             child: Text(widget.post.captions,
               style: GoogleFonts.roboto(
                 color: Colors.black,

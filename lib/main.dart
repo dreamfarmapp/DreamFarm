@@ -10,7 +10,7 @@ import 'package:dreamfarm/screens/JobOpportunity/skill_add.dart';
 import 'package:dreamfarm/screens/MarketPlace/add_product.dart';
 import 'package:dreamfarm/screens/MarketPlace/market_place.dart';
 import 'package:dreamfarm/screens/MarketPlace/product_screen.dart';
-import 'package:dreamfarm/screens/Networks/networks_page.dart';
+import 'package:dreamfarm/screens/Therapy/therapy_screen.dart';
 import 'package:dreamfarm/screens/UserProfile/UserProfile.dart';
 import 'package:dreamfarm/screens/home/ui/home_screen.dart';
 import 'package:dreamfarm/screens/language_select/language_select.dart';
@@ -85,13 +85,14 @@ class _MyAppState extends State<MyApp> {
             '/cropdoc-input': (context) => const CropDocInput(),
             '/marketplace': (context) =>  MarketplaceScreen(),
             '/product': (context) => ProductScreen(),
-            '/networks': (context) => NetworksScreen(),
+            //'/networks': (context) => NetworksScreen(),
             '/skill': (context) => const SkillAddScreen(),
             '/job' : (context) =>  JobListingScreen(),
             '/addproduct': (context) => AddProductScreen(),
-            '/addpost': (context) => AddPostScreen()
+            '/addpost': (context) => AddPostScreen(),
+            '/therapy' : (context) => TherapyScreen()
           },
-          initialRoute: "/addpost",
+          initialRoute: "/login",
         );
       },
     );

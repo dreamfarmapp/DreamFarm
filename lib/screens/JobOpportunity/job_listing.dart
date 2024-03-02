@@ -1,26 +1,30 @@
+import 'dart:convert';
+
 import 'package:dreamfarm/Model/JobModel.dart';
 import 'package:dreamfarm/screens/JobOpportunity/job_card.dart';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
-List<JobModel> joblist = [
-  JobModel(
-      title: "Software Developer",
-      skills: ["C", "Flutter", "Java"],
-      url: "https://www.google.com"),
-  JobModel(
-      title: "Software Developer",
-      skills: ["C", "Flutter", "Java"],
-      url: "https://www.google.com"),
-  JobModel(
-      title: "Software Developer",
-      skills: ["C", "Flutter", "Java"],
-      url: "https://www.google.com"),
-  JobModel(
-      title: "Software Developer",
-      skills: ["C", "Flutter", "Java"],
-      url: "https://www.google.com"),
-];
+// List<JobModel> joblist = [
+//   JobModel(
+//       title: "Software Developer",
+//       skills: ["C", "Flutter", "Java"],
+//       url: "https://www.google.com"),
+//   JobModel(
+//       title: "Software Developer",
+//       skills: ["C", "Flutter", "Java"],
+//       url: "https://www.google.com"),
+//   JobModel(
+//       title: "Software Developer",
+//       skills: ["C", "Flutter", "Java"],
+//       url: "https://www.google.com"),
+//   JobModel(
+//       title: "Software Developer",
+//       skills: ["C", "Flutter", "Java"],
+//       url: "https://www.google.com"),
+// ];
 
 class JobListingScreen extends StatefulWidget {
   JobListingScreen({super.key});
@@ -30,6 +34,37 @@ class JobListingScreen extends StatefulWidget {
 }
 
 class _JobListingScreenState extends State<JobListingScreen> {
+  List<String>? skillList;
+  List<JobModel> joblist = [];
+
+  Future<void> fetchJob(List<String> skills) async {
+    final response = await http.get(Uri.parse(
+        "http://10.0.2.2:8001/jobs/?familiar_skills=${skills.join(",")}"));
+    if (response.statusCode == 200) {
+      List<dynamic> respBody = jsonDecode(response.body);
+      List<JobModel> data = [];
+      respBody.forEach((element) {
+        data.add(JobModel(
+            title: element["Company Name"],
+            skills: element["Required Skills"],
+            url: element["More Info"]));
+      });
+      setState(() {
+        joblist = data;
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    if (skillList == null) {
+      skillList = ModalRoute.of(context)!.settings.arguments as List<String>;
+      fetchJob(skillList!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +91,7 @@ class _JobListingScreenState extends State<JobListingScreen> {
             ListTile(
               title: Text('Services'),
               onTap: () {
-                Navigator.pushNamed(context, '/services');
+                 makeCall("http://192.168.137.36:8501");
                 // Implement option 2 functionality here
               },
             ),
@@ -65,6 +100,13 @@ class _JobListingScreenState extends State<JobListingScreen> {
               onTap: () {
                 Navigator.pushNamed(context, '/skill');
                 // Implement option 2 functionality here
+              },
+            ),
+            ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
               },
             ),
           ],
@@ -142,12 +184,12 @@ class _JobListingScreenState extends State<JobListingScreen> {
                 height: 10,
               ),
               ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: joblist.length,
-                itemBuilder: (BuildContext context, int index) {
-                return JobCard(job: joblist[index]);
-              })
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: joblist.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return JobCard(job: joblist[index]);
+                  })
             ],
           ),
         ),

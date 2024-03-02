@@ -1,7 +1,9 @@
 import 'package:dreamfarm/Model/HomeScreenData.dart';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -14,6 +16,50 @@ class _AccountState extends State<Account> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text(
+                'Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.green,
+              ),
+            ),
+            ListTile(
+              title: Text('Crop Doc'),
+              onTap: () {
+                Navigator.pushNamed(context, "/cropdoc-input");
+                // Implement option 1 functionality here
+              },
+            ),
+            ListTile(
+              title: Text('Services'),
+              onTap: () {
+                 makeCall("http://192.168.137.36:8501");
+                // Implement option 2 functionality here
+              },
+            ),
+            ListTile(
+              title: Text('Job Opportunities'),
+              onTap: () {
+                Navigator.pushNamed(context, '/skill');
+                // Implement option 2 functionality here
+              },
+            ),
+            ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFDBF5E0),
@@ -40,8 +86,9 @@ class _AccountState extends State<Account> {
             {Navigator.pushNamed(context, "/community")}
           else if (value == 0)
             {Navigator.pushNamed(context, "/")}
+          else if (value == 2)
+            {Navigator.pushNamed(context, "/marketplace")}
         },
-        currentIndex: 0,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -55,8 +102,8 @@ class _AccountState extends State<Account> {
             label: 'Community',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
+            icon: Icon(Icons.shopping_cart),
+            label: 'MarketPlace',
           ),
         ],
       ),
@@ -190,25 +237,18 @@ class _AccountState extends State<Account> {
               ),
               Align(
                   alignment: Alignment.center,
-                  child:
-                      ElevatedButton(onPressed: () {}, child: Text("Log Out"))),
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        prefs.setBool("isLoggedIn", false);
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, "/login", (route) => false);
+                      },
+                      child: Text("Log Out"))),
               SizedBox(
                 height: 10.h,
               ),
-              Text(
-                "Premium Plans : ",
-                style: GoogleFonts.roboto(
-                    fontWeight: FontWeight.w600, color: Colors.black),
-              ),
-              SizedBox(
-                height: 10.h,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [Plans(name: "Quarterly", price: 100,),
-                Plans(name: "Half Yearly", price: 150,),
-                Plans(name: "Yearly", price: 200,)],
-              )
             ],
           ),
         ),
@@ -231,21 +271,29 @@ class Plans extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
-          Text(name,
+          Text(
+            name,
             style: GoogleFonts.roboto(
-              fontWeight: FontWeight.w600, fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
+              fontSize: 18.sp,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: 20.h,),
-          Text("Rs ${price}",
+          SizedBox(
+            height: 20.h,
+          ),
+          Text(
+            "Rs ${price}",
             style: GoogleFonts.roboto(
-              fontWeight: FontWeight.w400, fontSize: 16.sp,
+              fontWeight: FontWeight.w400,
+              fontSize: 16.sp,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: 20.h,),
-          ElevatedButton(onPressed: (){}, child: Text("BUY"))
+          SizedBox(
+            height: 20.h,
+          ),
+          ElevatedButton(onPressed: () {}, child: Text("BUY"))
         ],
       ),
     );

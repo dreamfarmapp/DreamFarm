@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:dreamfarm/languages/language_constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,13 +22,81 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool isShow = false;
 
-  void handleLogin() {
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  Future<Placemark> _getAddressFromLatLng(Position position) async {
+    List<Placemark> place =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    return place[0];
+    //     .then((List<Placemark> placemarks) {
+    //   Placemark place = placemarks[0];
+    //   setState(() {
+    //     _currentAddress =
+    //        '${place.street}, ${place.subLocality},
+    //         ${place.subAdministrativeArea}, ${place.postalCode}';
+    //   });
+    // }).catchError((e) {
+    //   debugPrint(e);
+    // });
+  }
+
+  void handleLogin() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
+    Position pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    Placemark place = await _getAddressFromLatLng(pos);
     Map<dynamic, dynamic> reqBody = {
       "username": userNameController.text,
       "password": passwordController.text
     };
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     print(reqBody);
-    Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+    final response = await http.post(Uri.parse("http://10.0.2.2:8000/login/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(reqBody));
+    if (response.statusCode == 200) {
+      prefs.setBool("isLoggedIn", true);
+      Map<dynamic, dynamic> respBody = jsonDecode(response.body);
+      respBody = respBody['details'];
+      respBody['latitude'] = 37.4219983;
+      respBody['longitude'] = -122.084;
+      prefs.setString("user", jsonEncode(respBody));
+      Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error logging in")));
+    }
+    //Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
   }
 
   @override

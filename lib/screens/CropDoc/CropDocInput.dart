@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dreamfarm/Model/HomeScreenData.dart';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -79,19 +80,39 @@ class _CropDocInputState extends State<CropDocInput> {
               },
             ),
             ListTile(
-              title: Text('Option 2'),
+              title: Text('Services'),
               onTap: () {
+                 makeCall("http://192.168.137.36:8501");
                 // Implement option 2 functionality here
               },
             ),
-            // Add more list tiles for other options as needed
+            ListTile(
+              title: Text('Job Opportunities'),
+              onTap: () {
+                Navigator.pushNamed(context, '/skill');
+                // Implement option 2 functionality here
+              },
+            ),
+
+             ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
+              },
+            ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1,
         onTap: (value) => {
-          if (value == 1) {Navigator.pushNamed(context, "/community")}
-          else if (value == 0) {Navigator.pushNamed(context, "/")}
+          if (value == 1)
+            {Navigator.pushNamed(context, "/community")}
+          else if (value == 0)
+            {Navigator.pushNamed(context, "/")}
+          else if (value == 2)
+            {Navigator.pushNamed(context, "/marketplace")}
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -106,8 +127,8 @@ class _CropDocInputState extends State<CropDocInput> {
             label: 'Community',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
+            icon: Icon(Icons.shopping_cart),
+            label: 'MarketPlace',
           ),
         ],
       ),

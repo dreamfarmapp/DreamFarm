@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -27,16 +31,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Placemark place = await _getAddressFromLatLng(pos);
 
     Map<dynamic, dynamic> reqBody = {
-      "fullName": fullNameController.text,
+      "name": fullNameController.text,
       "username": userNameController.text,
       "email": emailController.text,
       "password": passwordController.text,
       "latitude": pos.latitude,
       "longitude": pos.longitude,
-      "address" : place
+      "address": place,
+      "language": "tamil"
     };
     print(reqBody);
-    Navigator.pushNamed(context, "/");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final response = await http.post(Uri.parse("http://10.0.2.2:8000/users/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(reqBody));
+    print("Working");
+    if (response.statusCode == 201) {
+      prefs.setBool("isLoggedIn", true);
+      prefs.setString("user", jsonEncode(reqBody));
+      Navigator.pushNamed(context, "/");
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Error creating account")));
+    }
   }
 
   Future<bool> _handleLocationPermission() async {

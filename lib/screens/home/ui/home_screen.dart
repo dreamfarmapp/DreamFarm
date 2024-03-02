@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,9 +47,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> getWeatherData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<dynamic, dynamic> user = jsonDecode(prefs.getString("user")!);
+    getWeatherDetails(user['latitude'], user['longitude']);
+  }
+
   @override
   void initState() {
-    getWeatherDetails(51.5073219, -0.1276474);
+    getWeatherData();
     super.initState();
   }
 
@@ -100,10 +108,24 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               title: Text('Services'),
               onTap: () {
+                 makeCall("http://192.168.137.36:8501");
                 // Implement option 2 functionality here
               },
             ),
-            // Add more list tiles for other options as needed
+            ListTile(
+              title: Text('Job Opportunities'),
+              onTap: () {
+                Navigator.pushNamed(context, '/skill');
+                // Implement option 2 functionality here
+              },
+            ),
+            ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
+              },
+            ),
           ],
         ),
       ),
@@ -119,20 +141,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
-            isAlert ? Container(
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  color: Colors.red[50],
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 1, color: Colors.red)),
-              child: Center(
-                child: Text(
-                  alert,
-                  style: GoogleFonts.lexend(color: Colors.red),
-                ),
-              ),
-            ) : SizedBox(),
+            isAlert
+                ? Container(
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        color: Colors.red[50],
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(width: 1, color: Colors.red)),
+                    child: Center(
+                      child: Text(
+                        alert,
+                        style: GoogleFonts.lexend(color: Colors.red),
+                      ),
+                    ),
+                  )
+                : SizedBox(),
             // Display current weather data here
             Container(
               padding: EdgeInsets.all(20),
@@ -178,10 +202,20 @@ class _HomeScreenState extends State<HomeScreen> {
               shrinkWrap: true,
               crossAxisCount: 2,
               children: <Widget>[
-                ServiceContainer(
-                    icon: Icons.agriculture, label: 'Soil Testing'),
-                ServiceContainer(
-                    icon: Icons.storage, label: 'Storage Facilities'),
+                GestureDetector(
+                  onTap: () {
+                     makeCall("http://192.168.137.36:8501");
+                  },
+                  child: ServiceContainer(
+                      icon: Icons.agriculture, label: 'Soil Testing'),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    makeCall("http://192.168.137.36:8501");
+                  },
+                  child: ServiceContainer(
+                      icon: Icons.storage, label: 'Storage Facilities'),
+                ),
                 // Add more service containers as needed
               ],
             ),

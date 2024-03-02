@@ -1,9 +1,11 @@
 import 'package:dreamfarm/Model/ProductModel.dart';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProductScreen extends StatefulWidget {
+  
   const ProductScreen({super.key});
 
   @override
@@ -11,22 +13,19 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
-  ProductModel product = ProductModel(
-      productName: "Tractor 1",
-      productPrice: "450",
-      imageUrl:
-          "https://www.csceagri.in/web/image/lead.item/62/image_1920/TRAKSTAR%20531?unique=8f211c5",
-      id: 1,
-      ownerLocation: "Telungana",
-      ownerName: "Ramesh",
-      ownerNumber: "1234567890",
-      productDescription:
-          "The XYZ tractor is a reliable and versatile agricultural machine designed to streamline farm operations and maximize productivity. Built with durability and efficiency in mind, this tractor is suitable for various tasks, including plowing, tilling, planting, and hauling.",
-      type: "rent",
-      duration: "6 months");
+  ProductModel? product;
 
-  Future<void> makeCall() async {
-    var url = Uri.parse("tel:${product.ownerNumber}");
+ @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Access the arguments in the didChangeDependencies method
+    if (product == null) {
+      product = ModalRoute.of(context)!.settings.arguments as ProductModel?;
+    }
+  }
+
+  Future<void> makeACall() async {
+    var url = Uri.parse("tel:${product!.ownerNumber}");
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
@@ -112,10 +111,25 @@ class _ProductScreenState extends State<ProductScreen> {
             ListTile(
               title: Text('Services'),
               onTap: () {
+                 makeCall("http://192.168.137.36:8501");
                 // Implement option 2 functionality here
               },
             ),
-            // Add more list tiles for other options as needed
+            ListTile(
+              title: Text('Job Opportunities'),
+              onTap: () {
+                Navigator.pushNamed(context, '/skill');
+                // Implement option 2 functionality here
+              },
+            ),
+
+             ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
+              },
+            ),
           ],
         ),
       ),
@@ -128,7 +142,7 @@ class _ProductScreenState extends State<ProductScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
-                  product.imageUrl,
+                  product!.imageUrl,
                   height: 350,
                   width: double.infinity,
                 ),
@@ -140,14 +154,14 @@ class _ProductScreenState extends State<ProductScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    product.productName,
+                    product!.productName,
                     style: GoogleFonts.lexend(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                         fontSize: 20),
                   ),
                   Text(
-                    "₹${product.productPrice}",
+                    "₹${product!.productPrice}",
                     style: GoogleFonts.lexend(
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
@@ -172,14 +186,14 @@ class _ProductScreenState extends State<ProductScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        product.ownerName,
+                        product!.ownerName,
                         style: GoogleFonts.lexend(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 20),
                       ),
                       Text(
-                        product.ownerNumber,
+                        product!.ownerNumber,
                         style: GoogleFonts.lexend(
                             color: Colors.black,
                             fontWeight: FontWeight.normal,
@@ -200,7 +214,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     width: 10,
                   ),
                   Text(
-                    "${product.ownerLocation}",
+                    "${product!.ownerLocation}",
                     style: GoogleFonts.lexend(
                         fontWeight: FontWeight.w500, color: Colors.black),
                   )
@@ -217,7 +231,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     fontSize: 18),
               ),
               Text(
-                "${product.productDescription}",
+                "${product!.productDescription}",
                 style: GoogleFonts.lexend(
                   fontSize: 16,
                   color: Colors.black,
@@ -226,9 +240,9 @@ class _ProductScreenState extends State<ProductScreen> {
               SizedBox(
                 height: 10,
               ),
-              product.duration != null
+              product!.duration != 0
                   ? Text(
-                      "Duration : ${product.duration}",
+                      "Duration : ${product!.duration}",
                       style: GoogleFonts.lexend(
                           color: Colors.black,
                           fontWeight: FontWeight.normal,
@@ -245,9 +259,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     borderRadius: BorderRadius.circular(12),
                     color: const Color(0xFF80E51A)),
                 child: MaterialButton(
-                  onPressed: () => {
-                    makeCall()
-                  },
+                  onPressed: () => {makeACall()},
                   child: Center(
                     child: Text(
                       "Call Owner",

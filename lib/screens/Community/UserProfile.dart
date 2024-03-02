@@ -1,6 +1,7 @@
 import 'package:dreamfarm/Model/CommunityScreenData.dart';
 import 'package:dreamfarm/Model/UserData.dart';
 import 'package:dreamfarm/screens/Community/Posts.dart';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,79 +41,78 @@ class _UserProfilePageState extends State<UserProfilePage> {
           )
         ],
       ),
-      bottomNavigationBar: Container(
-        height: 60.h,
-        decoration: BoxDecoration(color: const Color(0xFFDBF5E0), boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 8)
-        ]),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/');
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    "assets/icons/home_black.png",
-                    height: 20.h,
-                  ),
-                  Text("Home",
-                      style: GoogleFonts.roboto(
-                          color: Colors.black, fontSize: 12.sp))
-                ],
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text(
+                'Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.green,
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  "assets/icons/community_green.png",
-                  height: 20.h,
-                ),
-                Text("Community",
-                    style: GoogleFonts.roboto(
-                        color: Colors.black, fontSize: 12.sp))
-              ],
-            ),
-            GestureDetector(
+            ListTile(
+              title: Text('Crop Doc'),
               onTap: () {
-                Navigator.pushNamed(context, '/cropdoc-input');
+                Navigator.pushNamed(context, "/cropdoc-input");
+                // Implement option 1 functionality here
               },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    "assets/icons/cropdoc_black.png",
-                    height: 20.h,
-                  ),
-                  Text("CropDoc",
-                      style: GoogleFonts.roboto(
-                          color: Colors.black, fontSize: 12.sp))
-                ],
-              ),
             ),
-            GestureDetector(
+            ListTile(
+              title: Text('Services'),
               onTap: () {
-                Navigator.pushNamed(context, '/account');
+                 makeCall("http://192.168.137.36:8501");
+                // Implement option 2 functionality here
               },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    "assets/icons/profile_black.png",
-                    height: 20.h,
-                  ),
-                  Text("Profile",
-                      style: GoogleFonts.roboto(
-                          color: Colors.black, fontSize: 12.sp))
-                ],
-              ),
-            )
+            ),
+            ListTile(
+              title: Text('Job Opportunities'),
+              onTap: () {
+                Navigator.pushNamed(context, '/skill');
+                // Implement option 2 functionality here
+              },
+            ),
+
+             ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
+              },
+            ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1,
+        onTap: (value) => {
+          if (value == 1)
+            {Navigator.pushNamed(context, "/community")}
+          else if (value == 0)
+            {Navigator.pushNamed(context, "/")}
+          else if (value == 2)
+            {Navigator.pushNamed(context, "/marketplace")}
+        },
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              "assets/icons/community_black.png",
+              height: 20,
+            ),
+            label: 'Community',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'MarketPlace',
+          ),
+        ],
       ),
       body: SafeArea(
           child: SingleChildScrollView(
@@ -270,6 +270,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 itemCount: userData.noOfPosts,
                 itemBuilder: (BuildContext context, int index) {
                   PostModel post = PostModel(
+                    title: "Hello",
                       postImageUrl:
                           "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
                       profileImageUrl: userData.profileImageUrl,

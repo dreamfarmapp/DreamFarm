@@ -1,13 +1,56 @@
+import 'dart:convert';
+
 import 'package:dreamfarm/Model/CommunityScreenData.dart';
+import 'package:dreamfarm/Model/ProductModel.dart';
 import 'package:dreamfarm/screens/Community/Posts.dart';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
-import '../../Model/HomeScreenData.dart';
-
-class CommunityPage extends StatelessWidget {
+class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
+
+  @override
+  State<CommunityPage> createState() => _CommunityPageState();
+}
+
+class _CommunityPageState extends State<CommunityPage> {
+  List<PostModel> allPosts = [];
+  Future<void> fetchAllPosts() async {
+    final response =
+        await http.get(Uri.parse("http://10.0.2.2:8000/community"));
+    if (response.statusCode == 200) {
+      List<dynamic> respBody = jsonDecode(response.body);
+      List<PostModel> data = [];
+      respBody.forEach((element) {
+        data.add(PostModel(
+            postImageUrl: element["img"],
+            profileImageUrl: element["title"].contains("Aswin")
+                ? "https://images.unsplash.com/profile-fb-1550775635-9ab106b96960.jpg?dpr=1&auto=format&fit=crop&w=150&h=150&q=60&crop=faces&bg=fff"
+                : "https://images.unsplash.com/profile-1648828806223-1852f704c58aimage?dpr=1&auto=format&fit=crop&w=150&h=150&q=60&crop=faces&bg=fff",
+            accountName: element['title'].contains('Aswin')
+                ? "Aswin Raaj P S"
+                : "Naveen Patel",
+            captions: element['description'],
+            isFollowed: false,
+            isSaved: false,
+            title: element['title'],
+            id: 2));
+      });
+      setState(() {
+        allPosts = data;
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    fetchAllPosts();
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +84,10 @@ class CommunityPage extends StatelessWidget {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {},
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, "/addpost");
+        },
         child: Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -93,12 +139,27 @@ class CommunityPage extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text('Option 2'),
+              title: Text('Services'),
               onTap: () {
+                 makeCall("http://192.168.137.36:8501");
                 // Implement option 2 functionality here
               },
             ),
-            // Add more list tiles for other options as needed
+            ListTile(
+              title: Text('Job Opportunities'),
+              onTap: () {
+                Navigator.pushNamed(context, '/skill');
+                // Implement option 2 functionality here
+              },
+            ),
+
+             ListTile(
+              title: Text('Therapy'),
+              onTap: () {
+                Navigator.pushNamed(context, "/therapy");
+                // Implement option 1 functionality here
+              },
+            ),
           ],
         ),
       ),
@@ -119,10 +180,10 @@ class CommunityPage extends StatelessWidget {
               ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: posts.length,
+                  itemCount: allPosts.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Post(
-                      post: posts[index],
+                      post: allPosts[index],
                     );
                   })
             ],

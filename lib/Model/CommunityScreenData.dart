@@ -5,6 +5,7 @@ class PostModel {
   bool isSaved;
   String captions;
   String accountName;
+  String title;
   int id;
   PostModel(
       {required this.postImageUrl,
@@ -13,11 +14,13 @@ class PostModel {
       required this.captions,
       required this.isFollowed,
       required this.isSaved,
+      required this.title,
       required this.id});
 }
 
 List<PostModel> posts = [
   PostModel(
+    title: "Woekin",
       postImageUrl:
           "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
       profileImageUrl:
@@ -28,6 +31,7 @@ List<PostModel> posts = [
       isSaved: false,
       id: 101),
   PostModel(
+    title: "Woekin",
       postImageUrl:
           "https://images.unsplash.com/photo-1533062618053-d51e617307ec?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       profileImageUrl:
@@ -38,6 +42,7 @@ List<PostModel> posts = [
       isSaved: false,
       id: 101),
   PostModel(
+    title: "Working",
       postImageUrl:
           "https://images.unsplash.com/photo-1627920769842-6887c6df05ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1933&q=80",
       profileImageUrl:
@@ -48,6 +53,7 @@ List<PostModel> posts = [
       isSaved: false,
       id: 103),
   PostModel(
+    title: "Woekin",
       postImageUrl:
           "https://images.unsplash.com/photo-1509099381441-ea3c0cf98b94?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80",
       profileImageUrl:
@@ -58,6 +64,7 @@ List<PostModel> posts = [
       isSaved: false,
       id: 104),
   PostModel(
+    title: "Woekin",
       postImageUrl:
           "https://images.unsplash.com/photo-1565647952915-9644fcd446a4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       profileImageUrl:

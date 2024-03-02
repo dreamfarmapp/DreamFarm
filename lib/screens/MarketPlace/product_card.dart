@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProductCard extends StatelessWidget {
-  ProductModel product;
-  ProductCard(
-      {super.key,
-      required this.product});
+  final ProductModel product;
+
+  ProductCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +47,16 @@ class ProductCard extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    Text(
-                      "${product.productDescription.substring(0, 30)}...",
-                      style: GoogleFonts.lexend(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 16,
-                        color: Colors.grey,
+                    if (product.productDescription != null &&
+                        product.productDescription.isNotEmpty)
+                      Text(
+                        "${product.productDescription.substring(0, product.productDescription.length < 30 ? product.productDescription.length : 30)}...",
+                        style: GoogleFonts.lexend(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 Text(
@@ -75,17 +76,21 @@ class ProductCard extends StatelessWidget {
               height: 40,
               width: double.infinity,
               decoration: BoxDecoration(
-                  color: const Color(0xFF80E51A),
-                  borderRadius: BorderRadius.circular(8)),
+                color: const Color(0xFF80E51A),
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: MaterialButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, "/product", arguments: product);
+                },
                 child: Center(
                   child: Text(
                     "View Product",
                     style: GoogleFonts.lexend(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ),
