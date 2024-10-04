@@ -21,5 +21,6 @@
   "home": "வீடு",
   "community": "சமூகம்",
   "marketplace": "சந்தை",
-  "select_language": "மொழியை தேர்வுசெய்க"  
+  "select_language": "மொழியை தேர்வுசெய்க" ,
+  "yield_predictor" : "விளைச்சல் முன்னறி"
 }

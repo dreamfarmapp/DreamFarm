@@ -21,5 +21,6 @@
     "home": "मुख्यपृष्ठ",
     "community": "समुदाय",
     "marketplace": "बाज़ार",
-    "select_language": "भाषा चुनें"
+    "select_language": "भाषा चुनें",
+    "yield_predictor" : "उपज भविष्यवक्ता"
 }

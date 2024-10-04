@@ -21,5 +21,6 @@
     "home": "Home",
     "community": "Community",
     "marketplace": "Marketplace",
-    "select_language": "Select Language"
+    "select_language": "Select Language",
+    "yield_predictor" : "Yield Predictor"
 }

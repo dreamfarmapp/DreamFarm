@@ -118,6 +118,12 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
+              title: Text(translation(context).yield_predictor), // i18n key
+              onTap: () {
+                 makeCall("http://172.168.74.38:8502");
+              },
+            ),
+            ListTile(
               title: Text(translation(context).job_opportunities), // i18n key
               onTap: () {
                 Navigator.pushNamed(context, '/skill');

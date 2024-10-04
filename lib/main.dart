@@ -87,9 +87,7 @@ class _MyAppState extends State<MyApp> {
             '/account': (context) => const Account(),
             '/cropdoc-input': (context) => const CropDocInput(),
             '/marketplace': (context) =>  MarketplaceScreen(),
-            '/product': (context) => ProductScreen(
-
-            ),
+            '/product': (context) => ProductScreen(            ),
             //'/networks': (context) => NetworksScreen(),
             '/skill': (context) => const SkillAddScreen(),
             '/job' : (context) =>  JobListingScreen(),
