@@ -71,7 +71,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                   borderRadius: BorderRadius.circular(20)),
               child: MaterialButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, "/login");
+                  Navigator.pop(context);
                 },
                 child: Center(
                   child: Text(

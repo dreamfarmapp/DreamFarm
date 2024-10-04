@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dreamfarm/languages/language_constant.dart'; // Import for i18n
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -73,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
         centerTitle: true,
-        title: Text('DreamFarm'),
+        title: Text(translation(context).dreamfarm), // i18n key
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
@@ -91,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: <Widget>[
             DrawerHeader(
               child: Text(
-                'Menu',
+                translation(context).menu, // i18n key
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
               decoration: BoxDecoration(
@@ -99,40 +100,41 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
-              title: Text('Crop Doc'),
+              title: Text(translation(context).cropdoc), // i18n key
               onTap: () {
                 Navigator.pushNamed(context, "/cropdoc-input");
-                // Implement option 1 functionality here
               },
             ),
             ListTile(
-              title: Text('Crop Recommendations'),
+              title: Text(translation(context).crop_recommendations), // i18n key
               onTap: () {
                 Navigator.pushNamed(context, "/recommend");
-                // Implement option 1 functionality here
               },
             ),
             ListTile(
-              title: Text('Services'),
+              title: Text(translation(context).services), // i18n key
               onTap: () {
-                 makeCall("http://192.168.1.4:8501");
-                // Implement option 2 functionality here
+                 makeCall("http://172.168.74.38:8501");
               },
             ),
             ListTile(
-              title: Text('Job Opportunities'),
+              title: Text(translation(context).job_opportunities), // i18n key
               onTap: () {
                 Navigator.pushNamed(context, '/skill');
-                // Implement option 2 functionality here
               },
             ),
-            // ListTile(
-            //   title: Text('Therapy'),
-            //   onTap: () {
-            //     Navigator.pushNamed(context, "/therapy");
-            //     // Implement option 1 functionality here
-            //   },
-            // ),
+            ListTile(
+              title: Text(translation(context).sensor_data), // i18n key
+              onTap: () {
+                Navigator.pushNamed(context, '/sensor');
+              },
+            ),
+             ListTile(
+              title: Text(translation(context).select_language), // i18n key
+              onTap: () {
+                Navigator.pushNamed(context, '/language');
+              },
+            ),
           ],
         ),
       ),
@@ -144,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.all(20),
               color: Colors.blue,
               child: Text(
-                'Current Weather Data',
+                translation(context).current_weather_data, // i18n key
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
@@ -164,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   )
                 : SizedBox(),
-            // Display current weather data here
             Container(
               padding: EdgeInsets.all(20),
               child: GridView.count(
@@ -174,22 +175,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: <Widget>[
                   WeatherInfoCard(
                     icon: Icons.thermostat_outlined,
-                    label: 'Temperature',
+                    label: translation(context).temperature, // i18n key
                     value: '$temp°C',
                   ),
                   WeatherInfoCard(
                     icon: Icons.cloud,
-                    label: 'Weather',
+                    label: translation(context).weather, // i18n key
                     value: description,
                   ),
                   WeatherInfoCard(
                     icon: Icons.water_outlined,
-                    label: 'Humidity',
+                    label: translation(context).humidity, // i18n key
                     value: '$humidity%',
                   ),
                   WeatherInfoCard(
                     icon: Icons.air_outlined,
-                    label: 'Wind Speed',
+                    label: translation(context).wind_speed, // i18n key
                     value: '$windspeed m/s',
                   ),
                 ],
@@ -199,11 +200,10 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.all(20),
               color: Colors.green,
               child: Text(
-                'Services',
+                translation(context).services, // i18n key
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
-            // Display services
             GridView.count(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
@@ -211,24 +211,23 @@ class _HomeScreenState extends State<HomeScreen> {
               children: <Widget>[
                 GestureDetector(
                   onTap: () {
-                     makeCall("http://192.168.137.36:8501");
+                     makeCall("http://172.168.74.38:8501");
                   },
                   child: ServiceContainer(
-                      icon: Icons.agriculture, label: 'Soil Testing'),
+                      icon: Icons.agriculture,
+                      label: translation(context).soil_testing), // i18n key
                 ),
                 GestureDetector(
                   onTap: () {
-                    makeCall("http://192.168.137.36:8501");
+                    makeCall("http://172.168.74.38:8501");
                   },
                   child: ServiceContainer(
-                      icon: Icons.storage, label: 'Storage Facilities'),
+                      icon: Icons.storage,
+                      label: translation(context).storage_facilities), // i18n key
                 ),
-                // Add more service containers as needed
               ],
             ),
-            SizedBox(
-                height:
-                    kBottomNavigationBarHeight), // Ensure bottom navigation bar visibility
+            SizedBox(height: kBottomNavigationBarHeight),
           ],
         ),
       ),
@@ -244,18 +243,18 @@ class _HomeScreenState extends State<HomeScreen> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: translation(context).home, // i18n key
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               "assets/icons/community_black.png",
               height: 20,
             ),
-            label: 'Community',
+            label: translation(context).community, // i18n key
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
-            label: 'MarketPlace',
+            label: translation(context).marketplace, // i18n key
           ),
         ],
       ),

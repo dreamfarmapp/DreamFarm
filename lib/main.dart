@@ -11,6 +11,7 @@ import 'package:dreamfarm/screens/JobOpportunity/skill_add.dart';
 import 'package:dreamfarm/screens/MarketPlace/add_product.dart';
 import 'package:dreamfarm/screens/MarketPlace/market_place.dart';
 import 'package:dreamfarm/screens/MarketPlace/product_screen.dart';
+import 'package:dreamfarm/screens/SensorData/sensor_data_screen.dart';
 import 'package:dreamfarm/screens/Therapy/therapy_screen.dart';
 import 'package:dreamfarm/screens/UserProfile/UserProfile.dart';
 import 'package:dreamfarm/screens/home/ui/home_screen.dart';
@@ -86,14 +87,17 @@ class _MyAppState extends State<MyApp> {
             '/account': (context) => const Account(),
             '/cropdoc-input': (context) => const CropDocInput(),
             '/marketplace': (context) =>  MarketplaceScreen(),
-            '/product': (context) => ProductScreen(),
+            '/product': (context) => ProductScreen(
+
+            ),
             //'/networks': (context) => NetworksScreen(),
             '/skill': (context) => const SkillAddScreen(),
             '/job' : (context) =>  JobListingScreen(),
             '/addproduct': (context) => AddProductScreen(),
             '/addpost': (context) => AddPostScreen(),
             '/therapy' : (context) => TherapyScreen(),
-            '/recommend': (context) => CropRecommendationScreen()
+            '/recommend': (context) => CropRecommendationScreen(),
+            '/sensor' : (context) => SensorDataScreen()
           },
           initialRoute: "/",
         );
