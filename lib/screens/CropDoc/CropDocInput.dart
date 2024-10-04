@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -154,28 +155,38 @@ class _CropDocInputState extends State<CropDocInput> {
               title: Text('Crop Doc'),
               onTap: () {
                 Navigator.pushNamed(context, "/cropdoc-input");
+                // Implement option 1 functionality here
+              },
+            ),
+            ListTile(
+              title: Text('Crop Recommendations'),
+              onTap: () {
+                Navigator.pushNamed(context, "/recommend");
+                // Implement option 1 functionality here
               },
             ),
             ListTile(
               title: Text('Services'),
               onTap: () {
-                //makeCall("http://192.168.137.36:8501");
+                 makeCall("http://192.168.1.4:8501");
+                // Implement option 2 functionality here
               },
             ),
             ListTile(
               title: Text('Job Opportunities'),
               onTap: () {
                 Navigator.pushNamed(context, '/skill');
+                // Implement option 2 functionality here
               },
             ),
-            ListTile(
-              title: Text('Therapy'),
-              onTap: () {
-                Navigator.pushNamed(context, "/therapy");
-              },
-            ),
-          ],
-        ),
+            // ListTile(
+            //   title: Text('Therapy'),
+            //   onTap: () {
+            //     Navigator.pushNamed(context, "/therapy");
+            //     // Implement option 1 functionality here
+            //   },
+            // ),
+          ],       ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,

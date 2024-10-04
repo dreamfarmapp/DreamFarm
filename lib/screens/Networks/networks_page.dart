@@ -1,5 +1,6 @@
 import 'package:dreamfarm/Model/ServiceModel.dart';
 import 'package:dreamfarm/screens/Networks/service_card.dart';
+import 'package:dreamfarm/services/launchUrl.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -56,9 +57,16 @@ class _NetworksScreenState extends State<NetworksScreen> {
               },
             ),
             ListTile(
+              title: Text('Crop Recommendations'),
+              onTap: () {
+                Navigator.pushNamed(context, "/recommend");
+                // Implement option 1 functionality here
+              },
+            ),
+            ListTile(
               title: Text('Services'),
               onTap: () {
-                Navigator.pushNamed(context, '/networks');
+                 makeCall("http://192.168.1.4:8501");
                 // Implement option 2 functionality here
               },
             ),
@@ -69,16 +77,14 @@ class _NetworksScreenState extends State<NetworksScreen> {
                 // Implement option 2 functionality here
               },
             ),
-
-             ListTile(
-              title: Text('Therapy'),
-              onTap: () {
-                Navigator.pushNamed(context, "/therapy");
-                // Implement option 1 functionality here
-              },
-            ),
-          ],
-        ),
+            // ListTile(
+            //   title: Text('Therapy'),
+            //   onTap: () {
+            //     Navigator.pushNamed(context, "/therapy");
+            //     // Implement option 1 functionality here
+            //   },
+            // ),
+          ],    ),
       ),
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(165, 214, 167, 1),

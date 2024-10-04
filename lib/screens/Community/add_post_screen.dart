@@ -103,7 +103,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children: <Widget>[
+          children:  <Widget>[
             DrawerHeader(
               child: Text(
                 'Menu',
@@ -121,9 +121,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
               },
             ),
             ListTile(
+              title: Text('Crop Recommendations'),
+              onTap: () {
+                Navigator.pushNamed(context, "/recommend");
+                // Implement option 1 functionality here
+              },
+            ),
+            ListTile(
               title: Text('Services'),
               onTap: () {
-                makeCall("http://192.168.1.4:8501");
+                 makeCall("http://192.168.1.4:8501");
                 // Implement option 2 functionality here
               },
             ),
@@ -134,15 +141,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 // Implement option 2 functionality here
               },
             ),
-            ListTile(
-              title: Text('Therapy'),
-              onTap: () {
-                Navigator.pushNamed(context, "/therapy");
-                // Implement option 1 functionality here
-              },
-            ),
-          ],
-        ),
+            // ListTile(
+            //   title: Text('Therapy'),
+            //   onTap: () {
+            //     Navigator.pushNamed(context, "/therapy");
+            //     // Implement option 1 functionality here
+            //   },
+            // ),
+          ], ),
       ),
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(165, 214, 167, 1),

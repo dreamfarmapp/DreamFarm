@@ -62,9 +62,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
               },
             ),
             ListTile(
+              title: Text('Crop Recommendations'),
+              onTap: () {
+                Navigator.pushNamed(context, "/recommend");
+                // Implement option 1 functionality here
+              },
+            ),
+            ListTile(
               title: Text('Services'),
               onTap: () {
-                 makeCall("http://192.168.1.4:8501/");
+                 makeCall("http://192.168.1.4:8501");
                 // Implement option 2 functionality here
               },
             ),
@@ -75,16 +82,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 // Implement option 2 functionality here
               },
             ),
-
-             ListTile(
-              title: Text('Therapy'),
-              onTap: () {
-                Navigator.pushNamed(context, "/therapy");
-                // Implement option 1 functionality here
-              },
-            ),
-          ],
-        ),
+            // ListTile(
+            //   title: Text('Therapy'),
+            //   onTap: () {
+            //     Navigator.pushNamed(context, "/therapy");
+            //     // Implement option 1 functionality here
+            //   },
+            // ),
+          ],    ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,

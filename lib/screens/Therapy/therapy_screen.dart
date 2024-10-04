@@ -17,6 +17,7 @@ class _TherapyScreenState extends State<TherapyScreen> {
       await launchUrl(url);
     } else {}
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,9 +65,16 @@ class _TherapyScreenState extends State<TherapyScreen> {
               },
             ),
             ListTile(
+              title: Text('Crop Recommendations'),
+              onTap: () {
+                Navigator.pushNamed(context, "/recommend");
+                // Implement option 1 functionality here
+              },
+            ),
+            ListTile(
               title: Text('Services'),
               onTap: () {
-                makeCall("http://192.168.1.4:8501/");
+                makeCall("http://192.168.1.4:8501");
                 // Implement option 2 functionality here
               },
             ),
@@ -77,14 +85,13 @@ class _TherapyScreenState extends State<TherapyScreen> {
                 // Implement option 2 functionality here
               },
             ),
-
-             ListTile(
-              title: Text('Therapy'),
-              onTap: () {
-                Navigator.pushNamed(context, "/therapy");
-                // Implement option 1 functionality here
-              },
-            ),
+            // ListTile(
+            //   title: Text('Therapy'),
+            //   onTap: () {
+            //     Navigator.pushNamed(context, "/therapy");
+            //     // Implement option 1 functionality here
+            //   },
+            // ),
           ],
         ),
       ),
