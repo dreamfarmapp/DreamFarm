@@ -1,34 +1,111 @@
+import 'dart:convert';
 import 'dart:io';
-import 'package:dreamfarm/Model/HomeScreenData.dart';
-import 'package:dreamfarm/services/launchUrl.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CropDocInput extends StatefulWidget {
-  const CropDocInput({super.key});
+  const CropDocInput({Key? key}) : super(key: key);
 
   @override
   State<CropDocInput> createState() => _CropDocInputState();
 }
 
 class _CropDocInputState extends State<CropDocInput> {
+  final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
+  String _apiResponse = '';
+  bool _isLoading = false;
+  String _cloudinaryImageUrl = '';
 
   Future<void> _pickImage() async {
-    // final picker = ImagePicker();
-    // final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    // if (pickedFile != null) {
-    //   setState(() {
-    //     _selectedImage = File(pickedFile.path);
-    //   });
-    // }
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
       setState(() {
-        _selectedImage = File(result.files.single.path!);
+        _selectedImage = File(image.path);
+      });
+    }
+  }
+
+  Future<void> _uploadToCloudinary(File image) async {
+    final cloudinaryUrl =
+        'https://api.cloudinary.com/v1_1/ddkpclbs2/image/upload'; // Replace with your Cloudinary details
+    final preset = 'bisineimages'; // Replace with your upload preset
+
+    var request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl));
+    request.files.add(await http.MultipartFile.fromPath('file', image.path));
+    request.fields['upload_preset'] = preset;
+
+    var response = await request.send();
+    var responseData = await response.stream.toBytes();
+    var responseString = String.fromCharCodes(responseData);
+    var jsonResponse = json.decode(responseString);
+
+    setState(() {
+      _cloudinaryImageUrl = jsonResponse['secure_url'];
+    });
+  }
+
+  Future<void> _sendLinkToBackend(String imageUrl) async {
+    const backendUrl =
+        'http://10.0.2.2:3000/analyze-image'; // Replace with your backend URL
+
+    print(imageUrl);
+
+    var response = await http.post(
+      Uri.parse(backendUrl),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        'imageUrl': imageUrl,
+        'prompt':
+            'Analyze the disease in this crop image and suggest possible remedies.',
+      }),
+    );
+
+    print(response.body);
+    if (response.statusCode == 200) {
+      setState(() {
+        _apiResponse = json.decode(response.body)['analysis'] ??
+            'No response from backend.';
+      });
+    } else {
+      setState(() {
+        _apiResponse =
+            'Failed to get response from backend. Error: ${response.statusCode}';
+      });
+    }
+  }
+
+  Future<void> _analyzeImage() async {
+    if (_selectedImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an image first.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      //First upload the image to Cloudinary
+      await _uploadToCloudinary(_selectedImage!);
+
+      // After uploading to Cloudinary, send the image URL to the backend
+      if (_cloudinaryImageUrl.isNotEmpty) {
+        await _sendLinkToBackend(_cloudinaryImageUrl);
+      }
+    } catch (e) {
+      setState(() {
+        _apiResponse = 'An error occurred: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -61,6 +138,7 @@ class _CropDocInputState extends State<CropDocInput> {
       ),
       drawer: Drawer(
         child: ListView(
+
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
@@ -76,29 +154,24 @@ class _CropDocInputState extends State<CropDocInput> {
               title: Text('Crop Doc'),
               onTap: () {
                 Navigator.pushNamed(context, "/cropdoc-input");
-                // Implement option 1 functionality here
               },
             ),
             ListTile(
               title: Text('Services'),
               onTap: () {
-                 makeCall("http://192.168.137.36:8501");
-                // Implement option 2 functionality here
+                //makeCall("http://192.168.137.36:8501");
               },
             ),
             ListTile(
               title: Text('Job Opportunities'),
               onTap: () {
                 Navigator.pushNamed(context, '/skill');
-                // Implement option 2 functionality here
               },
             ),
-
-             ListTile(
+            ListTile(
               title: Text('Therapy'),
               onTap: () {
                 Navigator.pushNamed(context, "/therapy");
-                // Implement option 1 functionality here
               },
             ),
           ],
@@ -133,27 +206,46 @@ class _CropDocInputState extends State<CropDocInput> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Input an image of a crop infection to be analyzed:',
-              style: GoogleFonts.roboto(color: Colors.black),
-            ),
-            SizedBox(height: 10),
-            if (_selectedImage != null)
-              Image.file(_selectedImage!, width: 200, height: 200)
-            else
-              IconButton(
-                  onPressed: () {
-                    _pickImage();
-                  },
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 10,),
+              Text(
+                'Input an image of a crop infection to be analyzed:',
+                style: GoogleFonts.roboto(color: Colors.black),
+              ),
+              SizedBox(height: 10),
+              if (_selectedImage != null)
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Image.file(_selectedImage!, width: 200, height: 200),
+                )
+              else
+                IconButton(
+                  onPressed: _pickImage,
                   icon: Icon(
                     Icons.add_circle_outline_outlined,
                     color: Colors.grey,
                     size: 50.h,
-                  )),
-          ],
+                  ),
+                ),
+              SizedBox(height: 20),
+              if (_selectedImage != null)
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _analyzeImage,
+                  child: Text(_isLoading ? 'Analyzing...' : 'Analyze Image'),
+                ),
+              SizedBox(height: 20),
+              if (_apiResponse.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child:  MarkdownBody(
+                    data: _apiResponse,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

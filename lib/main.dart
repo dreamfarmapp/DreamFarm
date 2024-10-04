@@ -5,6 +5,7 @@ import 'package:dreamfarm/screens/Community/SearchScreen.dart';
 import 'package:dreamfarm/screens/Community/UserProfile.dart';
 import 'package:dreamfarm/screens/Community/add_post_screen.dart';
 import 'package:dreamfarm/screens/CropDoc/CropDocInput.dart';
+import 'package:dreamfarm/screens/CropRecommendations/crop_recommendations_screen.dart';
 import 'package:dreamfarm/screens/JobOpportunity/job_listing.dart';
 import 'package:dreamfarm/screens/JobOpportunity/skill_add.dart';
 import 'package:dreamfarm/screens/MarketPlace/add_product.dart';
@@ -91,9 +92,10 @@ class _MyAppState extends State<MyApp> {
             '/job' : (context) =>  JobListingScreen(),
             '/addproduct': (context) => AddProductScreen(),
             '/addpost': (context) => AddPostScreen(),
-            '/therapy' : (context) => TherapyScreen()
+            '/therapy' : (context) => TherapyScreen(),
+            '/recommend': (context) => CropRecommendationScreen()
           },
-          initialRoute: "/login",
+          initialRoute: "/",
         );
       },
     );
