@@ -9,7 +9,9 @@ class ProductModel {
   String ownerLocation;
   String type;
   String? duration;
-  ProductModel(
+  double? ownerLocationLat; // New property for owner's location latitude
+  double? ownerLocationLon; // New property for owner's location longitude
+    ProductModel(
       {required this.productName,
       required this.productPrice,
       required this.imageUrl,
@@ -19,5 +21,7 @@ class ProductModel {
       required this.ownerNumber,
       required this.productDescription,
       required this.type,
-      this.duration});
+      this.duration,
+      this.ownerLocationLat,
+    this.ownerLocationLon,});
 }

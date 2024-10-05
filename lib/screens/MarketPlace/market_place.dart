@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dreamfarm/Model/ProductModel.dart';
 import 'package:dreamfarm/screens/MarketPlace/product_card.dart';
@@ -17,6 +18,19 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   bool isRent = true;
   TextEditingController controller = TextEditingController();
   List<ProductModel> filteredProducts = [];
+
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  const R = 6371; // Radius of Earth in kilometers
+  double dLat = (lat2 - lat1) * (pi / 180);
+  double dLon = (lon2 - lon1) * (pi / 180);
+
+  double a = sin(dLat / 2) * sin(dLat / 2) +
+      cos(lat1 * (pi / 180)) * cos(lat2 * (pi / 180)) *
+      sin(dLon / 2) * sin(dLon / 2);
+
+  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  return R * c; // Distance in kilometers
+}
 
   //Toggle Options
   void showRent() {
@@ -37,6 +51,14 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     });
   }
 
+  // Add a list of predefined random locations with their latitudes and longitudes
+  List<Map<String, dynamic>> randomLocations = [
+    {'location': 'Chennai', 'lat': 13.0827, 'lon': 80.2707},
+    {'location': 'Trichy', 'lat': 10.7905, 'lon': 78.7047},
+    {'location': 'Telangana', 'lat': 17.1232, 'lon': 79.2088},
+    {'location': 'Coimbatore', 'lat': 11.0168, 'lon': 76.9558},
+  ];
+
   Future<void> fetchAllProducts() async {
     print("Fetching products...");
     final response =
@@ -45,28 +67,52 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       List<ProductModel> data = [];
       List<dynamic> respBody = jsonDecode(response.body);
       print("Response body: $respBody");
+
+      Random random = Random();
+
+      // Coimbatore coordinates
+      double coimbatoreLat = 11.0168;
+      double coimbatoreLon = 76.9558;
+
       respBody.forEach((element) {
+        // Assign a random location from Chennai, Trichy, Telangana, or Coimbatore
+        Map<String, dynamic> randomLocation =
+            randomLocations[random.nextInt(randomLocations.length)];
+
         data.add(ProductModel(
           productName: element['title'],
           productPrice: element['price'].toString(),
           imageUrl: element['img'],
           id: 1,
-          duration:
-              element['duration'] == 0 ? element['duration'].toString() : 0.toString(),
-          ownerLocation: "Telungana",
+          duration: element['duration'] == 0
+              ? element['duration'].toString()
+              : 0.toString(),
+          ownerLocation: randomLocation['location'], // Random location
           ownerName: "Aswin Raaj P S",
           ownerNumber: "9568812345",
           productDescription: element['description'],
           type: element['type'],
+          ownerLocationLat: randomLocation['lat'], // Latitude
+          ownerLocationLon: randomLocation['lon'], // Longitude
         ));
       });
-      print(data);
+
+      // Sort products by distance from Coimbatore
+      data.sort((a, b) {
+        double distA = calculateDistance(coimbatoreLat, coimbatoreLon,
+            a.ownerLocationLat!, a.ownerLocationLon!);
+        double distB = calculateDistance(coimbatoreLat, coimbatoreLon,
+            b.ownerLocationLat!, b.ownerLocationLon!);
+        return distA.compareTo(distB);
+      });
+
       setState(() {
         allProducts = data;
         filteredProducts =
             data.where((e) => e.type == (isRent ? "Rent" : "Buy")).toList();
       });
-      print("Products fetched successfully.");
+
+      print("Products fetched and sorted successfully.");
     } else {
       print("Failed to fetch products: ${response.statusCode}");
     }
@@ -238,7 +284,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children:  <Widget>[
+          children: <Widget>[
             DrawerHeader(
               child: Text(
                 'Menu',
@@ -265,7 +311,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             ListTile(
               title: Text('Services'),
               onTap: () {
-                 makeCall("http://192.168.1.4:8501");
+                makeCall("http://192.168.1.4:8501");
                 // Implement option 2 functionality here
               },
             ),
@@ -283,7 +329,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             //     // Implement option 1 functionality here
             //   },
             // ),
-          ],  ),
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,10 @@ import 'package:dreamfarm/Model/UserData.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'package:audioplayers/audioplayers.dart'; // For audio playback
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -14,11 +18,39 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   List<Chat> _chats = chats;
   TextEditingController textEditingController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   void addChat(String text) {
     setState(() {
       _chats.add(Chat(chat: text, chatId: 101, userId: 1));
     });
+  }
+
+  void addImageChat(String imagePath) {
+    setState(() {
+      _chats.add(Chat(chat: 'Image', chatId: 101, userId: 1, mediaUrl: imagePath, chatType: 'image'));
+    });
+  }
+
+  void addAudioChat(String audioPath) {
+    setState(() {
+      _chats.add(Chat(chat: 'Audio', chatId: 101, userId: 1, mediaUrl: audioPath, chatType: 'audio'));
+    });
+  }
+
+  Future<void> pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      addImageChat(pickedFile.path);
+    }
+  }
+
+  Future<void> pickAudio() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.audio);
+    if (result != null && result.files.single.path != null) {
+      addAudioChat(result.files.single.path!);
+    }
   }
 
   @override
@@ -62,7 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       alignment: currentChat.userId == 1
                           ? Alignment.topRight
                           : Alignment.topLeft,
-                      child: currentChat.userId == 1
+                      child: currentChat.chatType == 'text'
                           ? Container(
                               decoration: BoxDecoration(
                                 color: Colors.green[300],
@@ -79,51 +111,82 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ),
                               ),
                             )
-                          : Container(
-                              constraints: BoxConstraints(maxWidth: 250.w),
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(width: 2, color: Colors.green),
-                                borderRadius: BorderRadius.circular(5.r),
-                              ),
-                              margin: const EdgeInsets.all(5),
-                              padding: const EdgeInsets.all(5),
-                              child: Text(
-                                currentChat.chat,
-                                style: GoogleFonts.roboto(
-                                  color: Colors.black,
-                                  fontSize: 18.sp,
-                                ),
-                              ),
-                            ),
+                          : currentChat.chatType == 'image'
+                              ? Container(
+                                  margin: const EdgeInsets.all(5),
+                                  child: Image.file(
+                                    File(currentChat.mediaUrl!),
+                                    width: 150.w,
+                                    height: 150.h,
+                                  ),
+                                )
+                              : currentChat.chatType == 'audio'
+                                  ? Container(
+                                      margin: const EdgeInsets.all(5),
+                                      child: Container(
+                                         width: 150.w,
+                                    height: 150.h,
+                                        child: Row(
+                                          
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(Icons.play_arrow),
+                                              onPressed: () {
+                                                _audioPlayer.play( 
+                                                    UrlSource(currentChat.mediaUrl!));
+                                              },
+                                            ),
+                                            Text('Audio File'),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
                     );
                   },
                 ),
               ),
-              TextField(
-                controller: textEditingController,
-                style: GoogleFonts.roboto(
-                  color: Colors.black,
-                ),
-                onSubmitted: ((value) => addChat(value)),
-                decoration: InputDecoration(
-                  hintText: 'Type your message...',
-                  contentPadding: EdgeInsets.all(10),
-                  suffixIcon: IconButton(
-                    icon: const Icon(
-                      Icons.send,
-                      color: Colors.greenAccent,
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.image),
+                    onPressed: pickImage,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.audiotrack),
+                    onPressed: pickAudio,
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: textEditingController,
+                      style: GoogleFonts.roboto(
+                        color: Colors.black,
+                      ),
+                      onSubmitted: (value) {
+                        addChat(value);
+                        textEditingController.clear();
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Type your message...',
+                        contentPadding: EdgeInsets.all(10),
+                        suffixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.send,
+                            color: Colors.greenAccent,
+                          ),
+                          onPressed: () {
+                            addChat(textEditingController.text);
+                            textEditingController.clear();
+                            FocusScope.of(context).unfocus();
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                      ),
                     ),
-                    onPressed: () {
-                      addChat(textEditingController.text);
-                      textEditingController.clear();
-                      FocusScope.of(context).unfocus();
-                    },
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                ),
+                ],
               ),
             ],
           ),

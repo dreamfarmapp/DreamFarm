@@ -2,12 +2,25 @@ class Chat {
   int userId;
   int chatId;
   String chat;
-  Chat({required this.chat, required this.chatId, required this.userId});
+  String? mediaUrl; // For image or audio file URL
+  String chatType; // text, image, audio
+
+  Chat({
+    required this.chat,
+    required this.chatId,
+    required this.userId,
+    this.mediaUrl,
+    this.chatType = 'text', // default to text
+  });
+
+  
 }
 
 List<Chat> chats = [
-  Chat(chat: "Hi dude", chatId: 101, userId: 1),
-  Chat(chat: "Hello", chatId: 102, userId: 2),
-  Chat(chat: "How to prevent soil from dryness ?", chatId: 103, userId: 1),
-  Chat(chat: "Water soils regularly. If sun is too much, water soil with excess water ?", chatId: 104, userId: 2)
+  Chat(chat: "Hey, how are you?", chatId: 101, userId: 1, chatType: 'text'),
+  Chat(chat: "I'm good! How about you?", chatId: 102, userId: 2, chatType: 'text'),
+
+  Chat(chat: "Thanks! That was really helpful.", chatId: 105, userId: 1, chatType: 'text'),
+  
+  Chat(chat: "That looks efficient. Keep it up!", chatId: 107, userId: 2, chatType: 'text'),
 ];

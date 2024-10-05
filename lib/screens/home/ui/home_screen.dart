@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getWeatherDetails(double lat, double lon) async {
     final getWeatherEndpoint =
-        "https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}&units=metric";
+        "https://api.openweathermap.org/data/2.5/weather?lat=${11.0168}&lon=${76.9558}&appid=${api_key}&units=metric";
     setState(() {
       isLoading = true;
     });
